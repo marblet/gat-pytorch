@@ -18,7 +18,7 @@ if __name__=='__main__':
     # load a data according to input
     data = load_data('cora')
 
-    # create GCN and optimizer(Adam)
+    # create GAT and optimizer(Adam)
     model, optimizer = create_gat_model(data)
 
     # run the model niter times
