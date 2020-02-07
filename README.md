@@ -1,4 +1,4 @@
-# gcn-pytorch
+# gat-pytorch
 This is the pytorch inplementation of Graph Attention Networks.
 
 Petar Veličković et al.[Graph Attention Networks](https://arxiv.org/abs/1710.10903)
