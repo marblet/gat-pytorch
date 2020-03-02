@@ -7,25 +7,28 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 class GAT(nn.Module):
-    def __init__(self, data, nhid, nhead, alpha, dropout):
+    def __init__(self, data, nhid, nhead, nhead_out, alpha, dropout):
         super(GAT, self).__init__()
         nfeat, nclass = data.num_features, data.num_classes
         self.attentions = [GATConv(nfeat, nhid, dropout=dropout, alpha=alpha) for _ in range(nhead)]
+        self.out_atts = [GATConv(nhid * nhead, nclass, dropout=dropout, alpha=alpha) for _ in range(nhead_out)]
         for i, attention in enumerate(self.attentions):
             self.add_module('attention_{}'.format(i), attention)
-        self.out_att = GATConv(nhid * nhead, nclass, dropout=dropout, alpha=alpha)
+        for i, attention in enumerate(self.out_atts):
+            self.add_module('out_att{}'.format(i), attention)
         self.reset_parameters()
 
     def reset_parameters(self):
         for att in self.attentions:
             att.reset_parameters()
-        self.out_att.reset_parameters()
+        for att in self.out_atts:
+            att.reset_parameters()
 
     def forward(self, data):
         x, edge_list = data.features, data.edge_list
         x = torch.cat([att(x, edge_list) for att in self.attentions], dim=1)
         x = F.elu(x)
-        x = self.out_att(x, edge_list)
+        x = torch.sum(torch.stack([att(x, edge_list) for att in self.out_atts]), dim=0) / len(self.out_atts)
         return F.log_softmax(x, dim=1)
 
 
@@ -72,7 +75,7 @@ class GATConv(nn.Module):
         return h_prime
 
 
-def create_gat_model(data, nhid=8, nhead=8, alpha=0.2, dropout=0.6, lr=0.005, weight_decay=5e-4):
-    model = GAT(data, nhid, nhead, alpha=alpha, dropout=dropout)
+def create_gat_model(data, nhid=8, nhead=8, nhead_out=1, alpha=0.2, dropout=0.6, lr=0.005, weight_decay=5e-4):
+    model = GAT(data, nhid, nhead, nhead_out, alpha=alpha, dropout=dropout)
     optimizer = Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     return model, optimizer
