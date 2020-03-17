@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.optim import Adam
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -75,7 +74,6 @@ class GATConv(nn.Module):
         return h_prime
 
 
-def create_gat_model(data, nhid=8, nhead=8, nhead_out=1, alpha=0.2, dropout=0.6, lr=0.005, weight_decay=5e-4):
+def create_gat_model(data, nhid=8, nhead=8, nhead_out=1, alpha=0.2, dropout=0.6):
     model = GAT(data, nhid, nhead, nhead_out, alpha=alpha, dropout=dropout)
-    optimizer = Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
-    return model, optimizer
+    return model

@@ -18,9 +18,9 @@ if __name__=='__main__':
     # load a data according to input
     data = load_data('cora')
 
-    # create GAT and optimizer(Adam)
-    model, optimizer = create_gat_model(data)
+    # create GAT model
+    model = create_gat_model(data)
 
     # run the model niter times
-    run(data, model, optimizer, niter=10)
+    run(data, model, lr=0.005, weight_decay=5e-4, niter=10)
 ```
