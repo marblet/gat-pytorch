@@ -1,5 +1,5 @@
-from gat import create_gat_model
-from spgat import create_spgat_model
+from gat import GAT
+from spgat import SPGAT
 from train import run
 from data import load_data
 
@@ -9,9 +9,9 @@ if __name__=='__main__':
 
     # create GAT model
     # You can use the sparse version of GAT, which reduces computational time and memory consumption.
-    model = create_spgat_model(data)
+    model = SPGAT(data)
     # You can also use the dense version of GAT
-    # model = create_gat_model(data)
+    # model = GAT(data)
 
     # run the model niter times
     run(data, model, lr=0.005, weight_decay=5e-4, niter=10)
